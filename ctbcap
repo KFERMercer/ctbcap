@@ -9,7 +9,7 @@
 #
 
 CTBCAP_VERSION=4.0
-CTBCAP_RELEASE=9
+CTBCAP_RELEASE=r9
 
 # Command Options > Environment Variables > Default Arguments
 defaulting_args() {
@@ -67,12 +67,11 @@ doc() {
 		# Multi-line message should not be larger than 55 columns per line:
 		#     v                     55 columns                      v
 		echo "8=====================================================D"
-		echo "       ####   ######  #####    ####    ####   #####    "
-		echo "     ##  ##    ##    ##  ##  ##  ##  ##  ##  ##  ##    "
-		echo "    ##        ##    #####   ##      ######  #####      "
-		echo "   ##  ##    ##    ##  ##  ##  ##  ##  ##  ##          "
-		echo "   ####     ##    #####    ####   ##  ##  ##     .sh   "
-		echo "                        v${CTBCAP_VERSION}-r${CTBCAP_RELEASE}"
+		echo "       ####   ######  #####    ####    ####   #####"
+		echo "     ##  ##    ##    ##  ##  ##  ##  ##  ##  ##  ##"
+		echo "    ##        ##    #####   ##      ######  #####"
+		echo "   ##  ##    ##    ##  ##  ##  ##  ##  ##  ##"
+		echo "   ####     ##    #####    ####   ##  ##  ##  ${CTBCAP_VERSION}-${CTBCAP_RELEASE}"
 		echo "8=====================================================D"
 		echo "              Simping Stream from CB & SC"
 	;;
@@ -131,7 +130,7 @@ doc() {
 		echo "are also open - <https://github.com/KFERMercer/ctbcap>."
 	;;
 	ver)
-		printf "%s" "CtbCap/${CTBCAP_VERSION}-r${CTBCAP_RELEASE} "
+		printf "%s" "CtbCap/${CTBCAP_VERSION}-${CTBCAP_RELEASE} "
 		echo "Copyright (C) 2019-2026 KFERMercer <https://github.com/KFERMercer>"
 		echo
 		echo "Time-Mark: [$(date "+%Y%m%d-%H%M%S")] ($(date "+%Z"))"
