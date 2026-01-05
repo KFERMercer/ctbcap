@@ -1,18 +1,18 @@
 #
 # Copyright (C) 2019-2026 KFERMercer <https://github.com/KFERMercer>
 #
-# By default, this Dockerfile will build a minimal FFmpeg tailored for ctbcap.
-# By doing so, it will significantly reduce the size of final image. ( 140MB -> 18MB )
-# Requires 1GB of free space on file system to make default build.
+# By default, this Dockerfile will build a minimal FFmpeg tailored for ctbcap,
+# it will significantly reduce the size of final image. ( 140MB -> ~18MB )
 #
-# Make a default build:
-# `docker build --tag ctbcap ./`
+# Make default build (Minimal FFmpeg):
+# `docker build --tag ctbcap .`
 #
-# If you don't want build (tailored) FFmpeg:
-# `docker build --build-arg BUILD_TARGET=fat --target fat --tag ctbcap ./`
+# Or, use fat FFmpeg from Alpine repo:
+# `docker build --build-arg BUILD_TARGET=fat --target fat --tag ctbcap .`
 #
 
-# Universal base for ctbcap & FFmpeg builder.
+
+# Universal base for FFmpeg builder & final product.
 FROM alpine:latest AS mother
 
 RUN apk add --no-cache curl
@@ -109,10 +109,10 @@ HEALTHCHECK \
 
 ENTRYPOINT ["tini", "-g", "--", "ctbcap"]
 
+
 ARG BUILD_TARGET
 
-
-# Fatty product using pre-built FFmpeg.
+# Product using FFmpeg from Alpine repo.
 FROM heir AS fat
 
 RUN <<EOT
@@ -128,7 +128,7 @@ COPY ./ctbcap /usr/bin/
 USER ${CUID}:${CGID}
 
 
-# FFmpeg Build Machine.
+# FFmpeg builder.
 FROM mother AS builder
 
 RUN apk add --no-cache build-base gnupg openssl-dev nasm zlib-dev
@@ -234,7 +234,7 @@ RUN <<EOT
 EOT
 
 
-# Minimal product using live-built FFmpeg.
+# Product using minimal FFmpeg.
 FROM heir AS minimal
 
 COPY --from=builder /ffmpeg_bin/ffmpeg /usr/bin/
