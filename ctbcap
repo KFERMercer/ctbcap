@@ -188,8 +188,8 @@ world() {
 	defaulting_args
 
 	[ -z "${NOBANNER}" ] && {
-		echo
-		[ -z "${SHOW_VER}" ] && { doc neon; echo; } # never show banner when in version mode.
+		mgn
+		[ "1${SHOW_HELP}" -ge "1${SHOW_VER}" ] && { doc neon; echo; } # show banner, unless in version mode
 		[ -n "${BANNER}" ] && return 3
 	}
 	[ -n "${ERRIPT}" ] && {
