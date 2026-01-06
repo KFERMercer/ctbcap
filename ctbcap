@@ -411,32 +411,6 @@ init_path() {
 	esac
 }
 
-# Delay initial requests to servers by secs.
-# Usage:
-# Quiet mode (non-interactive friendly): `edging`
-# Verbose mode:                          `edging -v`
-edging() {
-	local EDGING_TIME="$(utils random_num 0 600)" # Range better EQ to watchdog().while.echo .
-	[ "$1" = "-v" ] && {
-		echo "Edging Mode is On."
-		echo
-		echo "Delay [${EDGING_TIME}]s before Simping [${MODEL}]."
-		echo
-		echo "Considering we won't send any requests to [${PLATFORM}]"
-		echo "server until Edging is over, So please make sure that"
-		echo "[${MODEL}] exists on [${PLATFORM}]. "
-		echo
-		echo "Edging..."
-		echo
-		sleep "${EDGING_TIME}"
-		echo "Edging Enough...Cum..."
-		echo
-		return
-	}
-	log "(NOTICE) Edging [${EDGING_TIME}]s before Simping [${MODEL}] (${PLATFORM})..."
-	sleep "${EDGING_TIME}"
-}
-
 # Core Platform Methods.
 # $STREAM_STAT = { OK | NO_URL (init) | NAME_CHANGE | WRONG_ROOM | BAD_URL | TIN_FOIL_HAT }
 # with return    { 0  | 1             | 1           | 1          | 1       | 110          }
@@ -708,7 +682,9 @@ watchdog() {
 	init_path -f "${WATCHDOG_LOGFILE}:" "${FFMPEG_LOGFILE}:" || { mgn >&2; exit 1; }
 
 	[ -n "${EDGING_MODE}" ] && {
-		[ -z "${NOBANNER}" ] && edging -v || edging
+		EDGING_TIME="$(utils random_num 0 600)"
+		log "(NOTICE) Edging Mode is On. Delay [${EDGING_TIME}]s before start simping..."
+		sleep "${EDGING_TIME}" && unset EDGING_TIME
 	}
 
 	watchdog 2>&1 | tee -a "${WATCHDOG_LOGFILE}" 2>/dev/null
