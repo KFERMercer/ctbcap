@@ -298,6 +298,14 @@ utils() {
 		done
 		echo $(( RSEED % ( BNUM - SNUM ) + SNUM )) # Format Same as $((RANDOM)) in Bash.
 	;;
+	# Take a nap for a while.
+	# Usage: `utils nap "<human time (e.g `10 min`)>" <least time (sec)> <maximum time (sec)>`
+	# If no <maximum time> specified, the <least time> will be applied.
+	nap)
+		[ -n "$4" ] && local NAP_TIME="$(utils random_num "$3" "$4")" || local NAP_TIME="$3"
+		log "Sleep for $([ -n "$4" ] && echo "around ")$2... [${NAP_TIME}]"
+		sleep "${NAP_TIME}"
+	;;
 	# Usage: `utils check_depend "<COMMAND>"`
 	check_depend)
 		command -v "$2" >/dev/null 2>&1 || {
@@ -641,11 +649,7 @@ watchdog() {
 		OK)
 			init_path -d "${SAVE_PATH}:${SAVE_PATH_SPACE}" "${LOG_PATH}:${LOG_PATH_SPACE}" \
 				&& { utils check_ffmpeg_ver; case $? in 0|2) true ;; *) false ;; esac; } \
-				|| {
-					log "Sleep for around 10 min..."
-					sleep "$(utils random_num 480 720)"
-					continue
-				}
+				|| { utils nap "10 min" 480 720; continue; }
 			log "Now Start Recording..."
 			while true; do
 				[ -n "${DEBUG_MODE}" ] \
@@ -657,32 +661,17 @@ watchdog() {
 					log "Restart recording..." && continue
 				} || {
 					log "Stream closed..."
-					log "Sleep for around 5 min & try reconnect..."
-					sleep "$(utils random_num 240 360)"
+					utils nap "5 min" 240 360
+					log "Try reconnect..."
 					break
 				}
 			done
 		;;
-		NO_URL)
-			log "Sleep for around 10 min..."
-			sleep "$(utils random_num 480 720)"
-		;;
-		NAME_CHANGE)
-			log "Sleep for around 5 sec..."
-			sleep "$(utils random_num 4 6)"
-		;;
-		WRONG_ROOM)
-			log "Sleep for around 1 hr..."
-			sleep "$(utils random_num 3300 3900)"
-		;;
-		BAD_URL)
-			log "Sleep for around 3 min..."
-			sleep "$(utils random_num 150 210)"
-		;;
-		*)
-			log "Sleep for around 12 hr..."
-			sleep "$(utils random_num 39600 46800)"
-		;;
+		NO_URL) utils nap "10 min" 480 720 ;;
+		NAME_CHANGE) utils nap "5 sec" 4 6 ;;
+		WRONG_ROOM) utils nap "1 hr" 3300 3900 ;;
+		BAD_URL) utils nap "3 min" 150 210 ;;
+		*) utils nap "12 hr" 39600 46800 ;;
 		esac
 	done
 }
