@@ -450,7 +450,7 @@ fetch_m3u() {
 						| head -n 1 \
 						| cut -d '"' -f4 \
 						| cut -d '.' -f1 \
-						| tr -d '\-:' \
+						| tr -d ':-' \
 						| sed 's|T|-|g' \
 					)"
 					log "Last streaming at: [${STREAM_LAST_SEEM}] (UTC)"
