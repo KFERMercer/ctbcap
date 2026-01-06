@@ -73,7 +73,6 @@ doc() {
 		echo "  ░██ ░██   ░██   ░██ ░██ ░██ ░██ ░██ ░██ ░██"
 		echo "   ░████    ░██   ░█████   ░████  ░██ ░██ ░██ $(printf "%7s" "${CTBCAP_VERSION}-${CTBCAP_RELEASE}")"
 		echo "8=====================================================D"
-		echo "              Simping Stream from CB & SC"
 	;;
 	help)
 		echo "Usage: $(basename "$0" 2>/dev/null || echo "$0") [options...] <Username|URL>"
@@ -249,7 +248,7 @@ world() {
 		FFMPEG_LOGFILE="${LOG_PATH}/${MODEL}-${PLATFORM}.ffmpeg.log"
 	}
 
-	[ -z "${NOBANNER}" ] && msg ">> Simping Streamer: [${MODEL}] (${PLATFORM})"
+	[ -z "${NOBANNER}" ] && msg ">> Simping [${MODEL}] (${PLATFORM})"
 
 	return 0
 }
@@ -454,7 +453,7 @@ fetch_m3u() {
 						| tr -d '\-:' \
 						| sed 's|T|-|g' \
 					)"
-					log "Last stream at: [${STREAM_LAST_SEEM}] (UTC)"
+					log "Last streaming at: [${STREAM_LAST_SEEM}] (UTC)"
 				}
 				STREAM_STAT=NO_URL && return 1
 			}
@@ -514,7 +513,7 @@ fetch_m3u() {
 
 	# If successfully grabbed ${STREAM_URL}, show them.
 	[ -n "${STREAM_URL}" ] && {
-		log "[${MODEL}] is Online Now! [$([ -n "${ROOM_STATUS}" ] && echo "${ROOM_STATUS}" || echo online)]"
+		log "[${MODEL}] is Online! [$([ -n "${ROOM_STATUS}" ] && echo "${ROOM_STATUS}" || echo online)]"
 		log "Stream URL: [${STREAM_URL}]"
 		STREAM_STAT=OK && return 0
 	} || {
