@@ -445,7 +445,7 @@ fetch_m3u() {
 			} || {
 				log "[${MODEL}] is [${ROOM_STATUS}] now. [${CONNECT_STAT}]"
 				[ -z "${STREAM_LAST_SEEM}" ] && {
-					local STREAM_LAST_SEEM="$(utils connect_dump "https://chaturbate.com/api/biocontext/${MODEL}/" \
+					STREAM_LAST_SEEM="$(utils connect_dump "https://chaturbate.com/api/biocontext/${MODEL}/" \
 						| grep -oE '"last_broadcast":[ ]?"[^"]+"' \
 						| head -n 1 \
 						| cut -d '"' -f4 \
