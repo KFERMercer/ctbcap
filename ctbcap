@@ -533,8 +533,7 @@ fetch_m3u() {
 	# If successfully grabbed ${STREAM_URL}, show them.
 	[ -n "${STREAM_URL}" ] && {
 		log "[${MODEL}] is Online Now! [$([ -n "${ROOM_STATUS}" ] && echo "${ROOM_STATUS}" || echo online)]"
-		log "Successfully Captured Stream URL:"
-		log "${STREAM_URL}"
+		log "Stream URL: [${STREAM_URL}]"
 		STREAM_STAT=OK && return 0
 	} || {
 		log "(ERROR) Failed to fetch Stream URL!$([ -n "${CONNECT_STAT}" ] && echo " [${CONNECT_STAT}]")"
