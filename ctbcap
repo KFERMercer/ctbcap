@@ -463,6 +463,17 @@ fetch_m3u() {
 				true
 			} || {
 				log "[${MODEL}] is [${ROOM_STATUS}] now. [${CONNECT_STAT}]"
+				[ -z "${STREAM_LAST_SEEM}" ] && {
+					local STREAM_LAST_SEEM="$(utils connect_dump "https://chaturbate.com/api/biocontext/${MODEL}/" \
+						| grep -oE '"last_broadcast":[ ]?"[^"]+"' \
+						| head -n 1 \
+						| cut -d '"' -f4 \
+						| cut -d '.' -f1 \
+						| tr -d '\-:' \
+						| sed 's|T|-|g' \
+					)"
+					log "Last stream at: [${STREAM_LAST_SEEM}] (UTC)"
+				}
 				STREAM_STAT=NO_URL && return 1
 			}
 			unset CONNECT_STAT
