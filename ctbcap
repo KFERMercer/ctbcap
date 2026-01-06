@@ -453,7 +453,9 @@ fetch_m3u() {
 						| tr -d ':-' \
 						| sed 's|T|-|g' \
 					)"
-					log "Last streaming at: [${STREAM_LAST_SEEM}] (UTC)"
+					[ -n "${STREAM_LAST_SEEM}" ] \
+						&& log "Last streaming at: [${STREAM_LAST_SEEM}] (UTC)" \
+						|| log "Last streaming time unknown."
 				}
 				STREAM_STAT=NO_URL && return 1
 			}
