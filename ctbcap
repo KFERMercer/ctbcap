@@ -452,8 +452,10 @@ fetch_m3u() {
 						| cut -d '.' -f1 \
 						| tr -d ':-' \
 						| sed 's|T|-|g' \
+						| grep -oE '^[0-9]{8}-[0-9]{6}$' \
+						|| echo 0 \
 					)"
-					[ -n "${STREAM_LAST_SEEM}" ] \
+					[ "${STREAM_LAST_SEEM}" != 0 ] \
 						&& log "Last streaming at: [${STREAM_LAST_SEEM}] (UTC)" \
 						|| log "Last streaming time unknown."
 				}
