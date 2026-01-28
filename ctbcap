@@ -414,11 +414,8 @@ init_path() {
 # $STREAM_STAT = { OK | NO_URL (init) | NAME_CHANGE | WRONG_ROOM | BAD_URL | TIN_FOIL_HAT }
 # with return    { 0  | 1             | 1           | 1          | 1       | 110          }
 fetch_m3u() {
-	[ -n "${MODEL_NEW_NAME}" ] && {
-		log "(NOTICE) Due to name change, [${MODEL_NEW_NAME}] will now be used for actual requests."
-		local MODEL="${MODEL_NEW_NAME}"
-	}
 	unset STREAM_URL
+	[ -n "${MODEL_NEW_NAME}" ] && local MODEL="${MODEL_NEW_NAME}"
 	STREAM_STAT=NO_URL # init
 
 	# Core Methods by each Platform.
@@ -471,6 +468,7 @@ fetch_m3u() {
 			MODEL_NEW_NAME=$(echo "${CONNECT_DUMP}" | grep -oE 'location:[ ]?/[^/]+/' | head -n 1 | cut -d '/' -f2)
 			[ -n "${MODEL_NEW_NAME}" ] && {
 				log >&2 "(WARNING) [${MODEL}] has changed her name to [${MODEL_NEW_NAME}]. [${CONNECT_STAT}]"
+				log "(NOTICE) [${MODEL_NEW_NAME}] will now be used for subsequent requests."
 				STREAM_STAT=NAME_CHANGE && return 1
 			} || {
 				log >&2 "(ERROR) Can't find [${MODEL}] on [${PLATFORM}]. [${CONNECT_STAT}]"
