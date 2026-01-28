@@ -9,7 +9,7 @@
 #
 
 CTBCAP_VERSION=4.0
-CTBCAP_RELEASE=r9
+CTBCAP_RELEASE=r10
 
 # Command Options > Environment Variables > Default Arguments
 defaulting_args() {
