@@ -363,7 +363,7 @@ init_path() {
 			local _DIR="${DIR}"; while [ ! -d "${_DIR}" ]; do # ${DIR} may not created yet
 				local _DIR="$(dirname "${_DIR}")"
 			done
-			local FREESPACE="$(( $(df -k "${_DIR}" | awk 'NR==2 {print $4}') / 1024 ))"
+			local FREESPACE="$(( $(df -Pk "${_DIR}" | awk 'NR==2 {print $4}') / 1024 ))"
 			[ "${FREESPACE}" -lt "${SPACE}" ] && {
 				log >&2 "(ERROR) Space on [${_DIR}/] must be bigger than ${SPACE}MiB! [${FREESPACE}MiB]"
 				return 1
