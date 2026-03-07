@@ -1,12 +1,8 @@
 #!/usr/bin/env sh
 #
 # A simple webcam capturer for CB & SC.
-#
 # Copyright (C) 2019-2026 KFERMercer <https://github.com/KFERMercer>
-#
-# shellcheck disable=2015,2016,2155,3043
-# shellcheck source=/dev/null
-#
+# shellcheck source=/dev/null disable=2015,2016,2155,3043
 
 CTBCAP_VERSION=4.0
 CTBCAP_RELEASE=r9
