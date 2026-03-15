@@ -208,7 +208,7 @@ world() {
 	[ -n "${SHOW_VER}" ] && { doc ver; return 2; }
 
 	[ -z "${MODEL}" ] && { msg >&2 "(ERROR) No Username or URL Specified!"; return 1; }
-	local _MODEL="$(basename "${MODEL}" 2>/dev/null | head -n 1 | tr '[:upper:]' '[:lower:]' | grep -oE '^[a-z0-9_-]+$')"
+	local _MODEL="$(basename -- "${MODEL}" 2>/dev/null | head -n 1 | tr '[:upper:]' '[:lower:]' | grep -oE '^[a-z0-9_-]+$')"
 	[ -z "${_MODEL}" ] && { msg >&2 "(ERROR) Invalid Username or URL! [${MODEL}]"; return 1; }
 	MODEL=${_MODEL}
 
