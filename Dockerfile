@@ -219,7 +219,7 @@ RUN <<EOT
 		--enable-parser=h264,hevc,av1,aac \
 		--enable-demuxer=hls,mp4,m4v,mpegts \
 		--enable-muxer=segment,matroska \
-		--enable-protocol=hls,http,https,file,udplite \
+		--enable-protocol=hls,http,https,file,udp \
 		--enable-bsf=extract_extradata \
 		--enable-small \
 		--optflags=-O3 --extra-ldflags="-s"
