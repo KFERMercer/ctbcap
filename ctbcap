@@ -71,7 +71,7 @@ doc() {
 		echo "8=====================================================D"
 	;;
 	help)
-		echo "Usage: $(basename "$0" 2>/dev/null || echo "$0") [options...] <Username|URL>"
+		echo "Usage: $(basename -- "$0" 2>/dev/null || echo "$0") [options...] <Username|URL>"
 		echo
 		echo "<Username|URL>		Streamer's Username or Chat"
 		echo "			Room URL."
@@ -208,7 +208,7 @@ world() {
 	[ -n "${SHOW_VER}" ] && { doc ver; return 2; }
 
 	[ -z "${MODEL}" ] && { msg >&2 "(ERROR) No Username or URL Specified!"; return 1; }
-	local _MODEL="$(basename "${MODEL}" 2>/dev/null | head -n 1 | tr '[:upper:]' '[:lower:]' | grep -oE '^[a-z0-9_-]+$')"
+	local _MODEL="$(basename -- "${MODEL}" 2>/dev/null | head -n 1 | tr '[:upper:]' '[:lower:]' | grep -oE '^[a-z0-9_-]+$')"
 	[ -z "${_MODEL}" ] && { msg >&2 "(ERROR) Invalid Username or URL! [${MODEL}]"; return 1; }
 	MODEL=${_MODEL}
 
@@ -230,7 +230,7 @@ world() {
 
 	SAVE_PATH="$(echo "${SAVE_PATH}" | sed "s|^~/|${HOME}/|")"
 	LOG_PATH="$(echo "${LOG_PATH}" | sed "s|^~/|${HOME}/|")"
-	_SAVE_PATH=$(realpath -m "${SAVE_PATH}" 2>/dev/null)
+	_SAVE_PATH=$(realpath -m -- "${SAVE_PATH}" 2>/dev/null)
 	[ -n "${_SAVE_PATH}" ] && SAVE_PATH=${_SAVE_PATH}
 	[ "${LOG_PATH}" = 0 ] && {
 		unset LOG_PATH
@@ -238,7 +238,7 @@ world() {
 		WATCHDOG_LOGFILE="/dev/null"
 		FFMPEG_LOGFILE="/dev/null"
 	} || {
-		_LOG_PATH=$(realpath -m "${LOG_PATH}" 2>/dev/null)
+		_LOG_PATH=$(realpath -m -- "${LOG_PATH}" 2>/dev/null)
 		[ -n "${_LOG_PATH}" ] && LOG_PATH=${_LOG_PATH}
 		WATCHDOG_LOGFILE="${LOG_PATH}/${MODEL}-${PLATFORM}.log"
 		FFMPEG_LOGFILE="${LOG_PATH}/${MODEL}-${PLATFORM}.ffmpeg.log"
@@ -361,15 +361,15 @@ init_path() {
 			[ -z "${DIR%"/"}" ] && { log >&2 "(ERROR) Root directory are not allowed!"; return 1; }
 
 			local _DIR="${DIR}"; while [ ! -d "${_DIR}" ]; do # ${DIR} may not created yet
-				local _DIR="$(dirname "${_DIR}")"
+				local _DIR="$(dirname -- "${_DIR}")"
 			done
-			local FREESPACE="$(( $(df -Pk "${_DIR}" | awk 'NR==2 {print $4}') / 1024 ))"
+			local FREESPACE="$(( $(df -Pk -- "${_DIR}" | awk 'NR==2 {print $4}') / 1024 ))"
 			[ "${FREESPACE}" -lt "${SPACE}" ] && {
 				log >&2 "(ERROR) Space on [${_DIR}/] must be bigger than ${SPACE}MiB! [${FREESPACE}MiB]"
 				return 1
 			}
 
-			mkdir -p "${DIR}" >/dev/null 2>&1
+			mkdir -p -- "${DIR}" >/dev/null 2>&1
 			[ ! -e "${DIR}" ] && { log >&2 "(ERROR) Unable to create directory [${DIR}] !"; return 1; }
 			[ ! -d "${DIR}" ] && { log >&2 "(ERROR) [${DIR}] is not a directory!"; return 1; }
 			[ ! -w "${DIR}" ] && { log >&2 "(ERROR) Unable to write to directory [${DIR}/] !"; return 1; }
@@ -396,10 +396,10 @@ init_path() {
 			[ "${LINE}" -le 0 ] && { true > "${FILE}"; } >/dev/null 2>&1
 			[ "$(wc -l 2>/dev/null < "${FILE}" || echo 0)" -ge "$(( LINE + 2000 ))" ] && { # 2000 as buffer size
 				echo "Trim [${FILE}] to ${LINE} lines..."
-				local BUFFER_FILE="/dev/shm/_$(basename "${FILE}" 2>/dev/null || echo what_the_fuck)_$(date +%s)"
-				tail -n "${LINE}" "${FILE}" > "${BUFFER_FILE}"
+				local BUFFER_FILE="/dev/shm/_$(basename -- "${FILE}" 2>/dev/null || echo what_the_fuck)_$(date +%s)"
+				tail -n "${LINE}" -- "${FILE}" > "${BUFFER_FILE}"
 				cat "${BUFFER_FILE}" > "${FILE}"
-				rm -f "${BUFFER_FILE}"
+				rm -f -- "${BUFFER_FILE}"
 			}
 		done
 	;;
