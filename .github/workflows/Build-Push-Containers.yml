@@ -25,7 +25,7 @@ jobs:
           { platform: 'linux/loong64', archname: 'loongarch64', buildtype: 'minimal' },
           { platform: 'linux/ppc64le', archname: 'ppc64le', buildtype: 'minimal' },
           { platform: 'linux/riscv64', archname: 'riscv64', buildtype: 'minimal' },
-          { platform: 'linux/s390x', archname: 's390x', buildtype: 'fat' } # Free Actions Runner are not enough to run minimal build for s390x.
+          { platform: 'linux/s390x', archname: 's390x', buildtype: 'minimal' }
         ]
 
     name: Build Container for ${{ matrix.platform }}
