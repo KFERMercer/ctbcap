@@ -165,7 +165,7 @@ world() {
 		o) [ -z "${OPTARG##"-"*}" ] && ERRIPT=${OPT} || LOG_PATH=${OPTARG} ;;
 		p) [ -z "${OPTARG##"-"*}" ] && ERRIPT=${OPT} || PLATFORM=${OPTARG} ;;
 		v) SHOW_VER=1 ;;
-		\?) ERRIPT=${OPTARG} ;;
+		\?) ERRIPT=${ERRIPT}${OPTARG} ;;
 		:)
 			case ${OPTARG} in
 			c) ERRIPT=c ;;
@@ -177,7 +177,7 @@ world() {
 		esac
 	done
 	shift $((OPTIND - 1))
-	[ -n "$2" ] && { shift 1; ERRIPT=_; }
+	[ -n "$2" ] && { shift 1; [ -z "${ERRIPT}" ] && ERRIPT=-; }
 	[ -n "$1" ] && MODEL=$1
 
 	defaulting_args
@@ -193,8 +193,8 @@ world() {
 		f) msg >&2 "(ERROR) -f: No Recording Saving Path Specified!" ;;
 		o) msg >&2 "(ERROR) -o: No Log Saving Path Specified!" ;;
 		p) msg >&2 "(ERROR) -p: No Platform Specified!" ;;
-		_) msg >&2 "(ERROR) Invalid Inputs: [$*] !" ;;
-		*) msg >&2 "(ERROR) Invalid Option: [${ERRIPT}] !" ;;
+		-) msg >&2 "(ERROR) Invalid Input: $(echo "$*" | sed 's|\([^[:space:]]\+\)|[\1]|g') !" ;;
+		*) msg >&2 "(ERROR) Invalid Option: $(echo "${ERRIPT}" | sed 's|.|[&] |g')!" ;;
 		esac
 		return 1
 	}
