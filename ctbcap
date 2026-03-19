@@ -136,11 +136,11 @@ doc() {
 		echo
 		printf "cURL: "
 		command -v "curl" >/dev/null 2>&1 || echo "N/A"
-		curl -V 2>/dev/null | head -n 1 | tr -s '[:space:]' ' ' | cut -d ' ' -f2
+		curl -V 2>/dev/null | awk 'NR==1 {print $2}'
 		echo
 		printf "FFmpeg: "
 		command -v "ffmpeg" >/dev/null 2>&1 || echo "N/A"
-		ffmpeg -version 2>/dev/null | head -n 1 | tr -s '[:space:]' ' ' | cut -d ' ' -f3
+		ffmpeg -version 2>/dev/null | awk 'NR==1 {print $3}'
 		echo
 		echo "See [ -h ] for Command Help."
 	;;
@@ -428,7 +428,7 @@ fetch_m3u() {
 			[ -n "$(echo "${CONNECT_DUMP}" | grep -oE 'http[s]?://edge[^ ]+\.m3u8'| head -n 1)" ] && {
 				STREAM_URL=$(echo "${CONNECT_DUMP}" | grep -oE 'http[s]?://edge[^ ]+\.m3u8' | head -n 1)
 				[ "$(utils connect_stat "${STREAM_URL}")" -ge 400 ] && {
-					STREAM_URL=$(echo "${STREAM_URL}" | sed 's|playlist.m3u8|playlist_sfm4s.m3u8|g' | sed 's|live-hls|live-c-fhls|g')
+					STREAM_URL=$(echo "${STREAM_URL}" | sed 's|playlist.m3u8|playlist_sfm4s.m3u8|g; s|live-hls|live-c-fhls|g')
 					[ "$(utils connect_stat "${STREAM_URL}")" -ge 400 ] && {
 						log >&2 "(ERROR) [${MODEL}] is Online now, but looks like the backend of [${PLATFORM}] has been changed."
 						unset STREAM_URL && { STREAM_STAT=BAD_URL && return 1; }
@@ -481,7 +481,7 @@ fetch_m3u() {
 		# Check if online:
 		2*|3*)
 			[ -n "$(echo "${CONNECT_DUMP}" | grep -o '"isCamAvailable":true' | head -n 1)" ] && {
-				local STREAMNAME="$(echo "${CONNECT_DUMP}" | grep '"streamName":' | head -n 1 | sed 's|.*"streamName":"||'| sed 's|".*||')"
+				local STREAMNAME="$(echo "${CONNECT_DUMP}" | grep '"streamName":' | head -n 1 | sed 's|.*"streamName":"||; s|".*||')"
 				STREAM_URL="https://edge-hls.sacdnssedge.com/hls/${STREAMNAME}/master/${STREAMNAME}_auto.m3u8"
 				local STREAM_URL_STATUS="$(utils connect_stat "${STREAM_URL}")"
 				[ "${STREAM_URL_STATUS}" -ge 400 ] && {
@@ -591,7 +591,7 @@ grab_stream() {
 		local _OPT_RAW="${_ARG}"
 		local _OPT="$(eval echo "${_ARG}")"
 		[ "${_OPT_RAW}" = "${_OPT}" ] && { local FFMPEG_EXEC="${FFMPEG_EXEC} ${_OPT_RAW}"; } || {
-			local _OPT="$(echo "${_OPT}" | sed "s|'|'\\\''|g" | sed "s|^|'|" | sed "s|$|'|")"
+			local _OPT="$(echo "${_OPT}" | sed "s|'|'\\\''|g; s|.*|'&'|")"
 			local FFMPEG_EXEC="${FFMPEG_EXEC} ${_OPT}"
 		}
 	done
