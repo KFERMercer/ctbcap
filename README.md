@@ -2,10 +2,10 @@
 
 <div align="center"><h2>Key Advantages</h2></div>
 
-- **Lightweight** - Written in most basic Shell Scripts to strive POSIX compatibility and energy efficiency.
+- **Lightweight** - Written in most basic Shell Scripts to achieve POSIX compatibility and energy efficiency.
   > Py is too heavy.
 
-- **All platforms available** - All functions are available with just require `curl` & `ffmpeg`.
+- **All platforms available** - All functions are available with just `curl` & `ffmpeg`.
   > $0.1 Temu Phone? No problem.
 
 - **Multifunction** - Auto Recording; Auto Monitoring; Auto Stopping; Large-Scale Deployment... Just find by yourself.
@@ -13,7 +13,7 @@
 
 <div align="center"><h2>Usage | Deploy</h2></div>
 
-### **Launch with One-Command:**
+### **Launch with One-Command**
 
 **Open your whatever terminal & drop this:**
 
@@ -22,26 +22,20 @@ sh -c "$(curl -sL https://kfermercer.github.io/ctbcap/ctbcap)" @ -h
 ```
 
 > [!NOTE]
-> Put the options after `@` like:\
-> `sh -c <...curl...stuff...> @ -ef ~/rec <Username|URL>`
+> Put the options after `@`. Example:\
+> `sh -c "$(curl -sL https://kfermercer.github.io/ctbcap/ctbcap)" @ -ef ./rec modelname1`
 
 > [!TIP]
-> You can also choose to download/upgrade CtbCap to your local:\
-> `curl -L https://kfermercer.github.io/ctbcap/ctbcap -o ctbcap && chmod +x ctbcap`\
-> \
-> Then, run `./ctbcap` to launch CtbCap.
-
-> [!TIP]
-> **Available on Termux.**
+> **Works on Termux!**
 
 ##
 
-### **Docker Container (Recommend) :**
+### **Docker Container**
 
 > [!NOTE]
-> If you're using such platforms that have good support for Docker or similar, I highly recommend to use this method: More serious; High-Availability; Everything runs in containers; Easily configures lot of chatrooms at the same time.
+> If you're using such platforms that have good support for Docker or similar, I highly recommend using this method: More serious; High-Availability; Everything runs in containers; Easily configures multiple chatrooms.
 
-#### **Official CtbCap Container Registry:**
+#### **Official CtbCap Container Registry**
 
 | Registry | Docker CLI |
 | :-: | :-: |
@@ -83,12 +77,12 @@ sh -c "$(curl -sL https://kfermercer.github.io/ctbcap/ctbcap)" @ -h
 </tr>
 </table>
 
-#### **Run As Compose Daemon (Recommend) :**
+#### **Run As Compose Daemon**
 
-  1. Custom your own compose file:
+  1. Customize your own compose file:
 
      ```shell
-     curl -L https://kfermercer.github.io/ctbcap/docker-compose.sample.yml -o ctbcap-compose.yml
+     curl https://kfermercer.github.io/ctbcap/docker-compose.sample.yml -o ctbcap-compose.yml
      ```
 
      Then edit `./ctbcap-compose.yml` to configure.
@@ -106,7 +100,7 @@ sh -c "$(curl -sL https://kfermercer.github.io/ctbcap/ctbcap)" @ -h
      docker compose -f ./ctbcap-compose.yml down --remove-orphans
      ```
 
-#### **Run with Docker CLI:**
+#### **Run with Docker CLI**
 
 ```shell
 docker run -t --rm \
@@ -122,32 +116,32 @@ kfermercer/ctbcap [options...] <Username|URL>
 > [!NOTE]
 > `-u <UID>:<GID>` Allows you to specify the user (UID) and group (GID) that the container will run as. For example, `-u 0:0` will run the container as root.\
 > \
-> If you don't specify `-u`, the container will running as `1000:1000`.\
+> If you don't specify `-u`, the container will run as `1000:1000`.\
 > \
 > Use `-u $(id -u):$(id -g)` to use your current UID and GID.
 
 > [!NOTE]
 > For Container Variables, see: [Container Variables](#container-variables).
 
-#### **Update the Container Image:**
+#### **Update the Container Image**
 
 See [Official CtbCap Container Registry](#official-ctbcap-container-registry).
 
-#### **Container Variables:**
+#### **Container Variables**
 
 | Variables | Value Type | Value Examples | Default | Recommend to Change |
 | :-: | :-: | :- | :- | :-: |
 | MODEL | Streamer's Username or Chatroom URL | `3rd8008` <br> `s1mp_L0r3-87` <br> `https://chaturbate.com/your_sister` <br> `https://stripchat.com/dicklessman` <br> ... | - | Yes |
 | PLATFORM | `chaturbate` or `stripchat` | `chaturbate` <br> `stripchat` | `chaturbate` | Yes, if not Chaturbate. |
 | EDGING_MODE | Inactive if not `1` | `1` <br> `12306` <br> ... | `uncles make me pee white` | Yes, if the streamer is currently offline. |
-| TZ | [TZ identifier](https://en.wikipedia.org/wiki/List_of_tz_database_time_zones#List) | `UTC` <br> `Asia/Shanghai` <br> `Africa/Harare` <br> ... | `UTC` | No, if you [live in Greenwich](https://www.royalgreenwich.gov.uk/info/200258/parking_transport_and_streets/810/find_a_public_toilet_in_royal_greenwich). |
+| TZ | [TZ identifier](https://en.wikipedia.org/wiki/List_of_tz_database_time_zones#List) | `UTC` <br> `Asia/Shanghai` <br> `Africa/Harare` <br> ... | `UTC` | Yes, unless you [live in Greenwich](https://web.archive.org/web/20241108012959/https://www.royalgreenwich.gov.uk/info/200258/parking_transport_and_streets/810/find_a_public_toilet_in_royal_greenwich). |
 | CUT_TIME | INT | `0` <br> `911` <br> `6324` <br> ... | `3600` | No |
 | DEBUG_MODE | Inactive if not `1` | `1` <br> `-999` <br> `i was born from my sis` <br> ... | `your mom is so hot` | No |
 | NOBANNER | Inactive if not `1` | `1` <br> `well, that reminds me` <br> ... | `^>vvv` (Docker CLI) <br> `1` (Compose file) | No |
 
 <div align="center"><h2>Command Examples</h2></div>
 
-#### Get help for commands:
+#### Get help for commands
 
 ```shell
 # Local:
@@ -160,7 +154,7 @@ sh -c "$(curl -sL https://kfermercer.github.io/ctbcap/ctbcap)" @
 docker run -t --rm kfermercer/ctbcap
 ```
 
-#### Simping your girl with nonstop:
+#### Simping your girl nonstop
 
 ```shell
 # Local:
@@ -177,7 +171,7 @@ docker run -t --rm -u $(id -u):$(id -g) -v ${PWD}/ctbcap_rec:/save kfermercer/ct
 > By default, the recording file will be saved to `${PWD}/ctbcap_rec/`.\
 > See the command help to change it if you want.
 
-#### Simping your girl and cut the recording files by every 1800 seconds:
+#### Simping your girl and cut the recording files every 1800 seconds
 
 ```shell
 # Local:
@@ -191,10 +185,10 @@ docker run -t --rm -u $(id -u):$(id -g) -v ${PWD}/ctbcap_rec:/save kfermercer/ct
 ```
 
 > [!NOTE]
-> By default, the recording files will get cut every `3600` seconds (60 min).\
-> Set the `-c` to `0` will disable the file cutting.
+> By default, the recording file will cut every `3600` seconds.\
+> Set `-c 0` to disable file cutting.
 
-#### Grab stream URL and generating FFmpeg command, but don't start recording:
+#### Grab stream URL and generate FFmpeg command, but don't start recording
 
 ```shell
 # Local:
@@ -207,7 +201,7 @@ sh -c "$(curl -sL https://kfermercer.github.io/ctbcap/ctbcap)" @ -l <Username|UR
 docker run -t --rm kfermercer/ctbcap -l <Username|URL>
 ```
 
-#### Show version & runtime info:
+#### Show version & runtime info
 
 ```shell
 # Local:
