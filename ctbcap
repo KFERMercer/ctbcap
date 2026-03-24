@@ -426,14 +426,11 @@ fetch_m3u() {
 		2*|3*)
 			local ROOM_STATUS="$(echo "${CONNECT_DUMP}" | grep -oE '"room_status":[ ]?"[^"]+"' | head -n 1 | cut -d '"' -f4)"
 			[ -n "$(echo "${CONNECT_DUMP}" | grep -oE 'http[s]?://edge[^ ]+\.m3u8'| head -n 1)" ] && {
-				STREAM_URL=$(echo "${CONNECT_DUMP}" | grep -oE 'http[s]?://edge[^ ]+\.m3u8' | head -n 1)
-				[ "$(utils connect_stat "${STREAM_URL}")" -ge 400 ] && {
-					STREAM_URL=$(echo "${STREAM_URL}" | sed 's|playlist.m3u8|playlist_sfm4s.m3u8|g; s|live-hls|live-c-fhls|g')
-					[ "$(utils connect_stat "${STREAM_URL}")" -ge 400 ] && {
-						log >&2 "(ERROR) [${MODEL}] is Online now, but looks like the backend of [${PLATFORM}] has been changed."
-						unset STREAM_URL && { STREAM_STAT=BAD_URL && return 1; }
-					}
-				}
+				STREAM_URL=$(echo "${CONNECT_DUMP}" | grep '"hls_source":' | head -n 1 | sed 's|.*"hls_source": "||; s|".*||')
+				# [ "$(utils connect_stat "${STREAM_URL}")" -ge 400 ] && {
+				# 	log >&2 "(ERROR) [${MODEL}] is Online now, but looks like the backend of [${PLATFORM}] has been changed."
+				# 	unset STREAM_URL && { STREAM_STAT=BAD_URL && return 1; }
+				# }
 				true
 			} || {
 				log "[${MODEL}] is [${ROOM_STATUS}] now. [${CONNECT_STAT}]"
