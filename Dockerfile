@@ -46,67 +46,6 @@ ENV EDGING_MODE="uncle makes me pee white"
 ENV DEBUG_MODE="your mom is so hot"
 ENV NOBANNER="^>vvv"
 
-COPY --chmod=755 <<-'EOF' /usr/bin/ctbcap-healthcheck
-	#!/usr/bin/env sh
-
-	# Copyright (C) 2019-2026 KFERMercer <https://github.com/KFERMercer>
-
-	[ "${DEBUG_MODE}" = "1" ] && set -x # Debug Mode
-
-	[ -z "${MODEL}" ] || [ -z "$(ps -ef | grep 'ctbcap' | grep -v grep | head -n 1)" ] && {
-		echo "No ctbcap process. Exit."
-		exit 0
-	}
-
-	# Process ${MODEL}
-	# TODO: Model may change their name, consider using realtime name.
-	MODEL="$(basename "${MODEL}" | head -n 1 | tr '[:upper:]' '[:lower:]' | grep -oE '^[a-z0-9_-]+$')"
-	[ -z "${MODEL}" ] && { echo >&2 "(ERROR) Invalid Username or URL!"; exit 1; }
-
-	# Process ${PLATFORM}
-	PLATFORM=$(echo "${PLATFORM}" | tr '[:upper:]' '[:lower:]')
-	case ${PLATFORM} in
-	chaturbate|ctb|cb) PLATFORM=chaturbate ;;
-	stripchat|stc|sc|st) PLATFORM=stripchat ;;
-	*)
-		echo >&2 "(ERROR) Invalid Platform!"
-		exit 1
-	;;
-	esac
-
-	FFMPEG_PROCESS="$(ps -ef | grep -oE "[f]fmpeg.*-i.*.m3u8.*${MODEL}.*.mkv" 2>/dev/null | head -n 1)"
-	# If has FFmpeg process...
-	[ -n "${FFMPEG_PROCESS}" ] && {
-		STREAM_URL="$(echo "${FFMPEG_PROCESS}" | grep -oE 'http[s]?://[^ ]+\.m3u8')"
-		UA="$(ctbcap -v | grep '^UA: ' | sed 's|UA: ||')"
-		[ -z "${UA}" ] && { echo >&2 "(ERROR) UA is not set!"; exit 1; }
-
-		M3U8_RESPONSE="$(curl "${STREAM_URL}" -4 -L -s -A "${UA}" --compressed --retry 3 --retry-delay 2 2>/dev/null | tr -d '\r')"
-		[ -n "${M3U8_RESPONSE}" ] && {
-			# Is directories writable?
-			[ ! -w "${SAVE_PATH}" ] && { echo >&2 "(ERROR) [${SAVE_PATH}] is unwritable!"; exit 1; }
-			[ "${LOG_PATH}" = 0 ] || { # Has FFmpeg process, but directories unwritable --> err
-				[ ! -w "${LOG_PATH}" ] && { echo >&2 "(ERROR) [${LOG_PATH}] is unwritable!"; exit 1; }
-			}
-		true
-		} || { # Has FFmpeg process, but m3u8 URL is unavailable --> err
-			echo >&2 "(ERROR) FFMPEG process did not exit correctly!"
-			exit 1
-		}
-	}
-
-	echo "Everything is OK!"
-	exit 0
-EOF
-
-HEALTHCHECK \
-	--interval=300s \
-	--timeout=30s \
-	--start-period=300s \
-	--start-interval=300s \
-	--retries=3 \
-	CMD ["ctbcap-healthcheck"]
-
 ENTRYPOINT ["tini", "-g", "--", "ctbcap"]
 
 
