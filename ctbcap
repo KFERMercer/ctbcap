@@ -427,7 +427,7 @@ fetch_m3u() {
 		local CONNECT_STAT="$(utils dump2stat "${CONNECT_DUMP}")"
 		case ${CONNECT_STAT} in
 		# Check if online:
-		2*|3*)
+		2*)
 			local ROOM_STATUS="$(echo "${CONNECT_DUMP}" | grep -oE '"room_status":[ ]?"[^"]+"' | head -n 1 | cut -d '"' -f4)"
 			[ -n "$(echo "${CONNECT_DUMP}" | grep -oE 'http[s]?://edge[^ ]+\.m3u8'| head -n 1)" ] && {
 				STREAM_URL=$(echo "${CONNECT_DUMP}" | grep '"hls_source":' | head -n 1 | sed 's|.*"hls_source": "||; s|".*||')
@@ -456,6 +456,10 @@ fetch_m3u() {
 				STREAM_STAT=NO_URL && return 1
 			}
 			unset CONNECT_STAT
+		;;
+		3*)
+			log >&2 "You might gotten blocked by CAPTCHA. [${CONNECT_STAT}]"
+			STREAM_STAT=NO_URL && return 1
 		;;
 		# Check if Model change to new name
 		404)
