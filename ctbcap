@@ -313,6 +313,10 @@ utils() {
 	# Human-friendly message and return value: `utils check_ffmpeg_ver`
 	# Check if version is met and return value: `utils check_ffmpeg_ver "[VERSION CODE]"`
 	check_ffmpeg_ver)
+		# TODO: Rewrite to more robust FFmpeg version check.
+		#       For example, the version code for `n7.1` could also be `N-117180-b08d7969c5`.
+		#       Use `git rev-list --count HEAD`, `git rev-parse --short HEAD` to check.
+
 		local REQ_VER=5.0 # Required minimum version of FFmpeg.
 		local REC_VER=7.1 # Recommended minimum version of FFmpeg.
 
