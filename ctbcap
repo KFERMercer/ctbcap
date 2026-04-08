@@ -40,6 +40,9 @@ defaulting_args() {
 	# Debug Mode. Inactive if not 1.
 	[ "${DEBUG_MODE}" = "1" ] || DEBUG_MODE=
 
+	# Ignore system proxy while recording.
+	[ "${RECORDING_IGNORE_PROXY}" = "1" ] || RECORDING_IGNORE_PROXY=
+
 	# Link Mode. Only grab stream URL. Inactive if not 1.
 	[ "${LINK_MODE}" = "1" ] || LINK_MODE=
 
@@ -547,6 +550,8 @@ grab_stream() {
 		{ local FFMPEG_BASEVER="6.0"; local EXT_FFMPEG_OPT="${EXT_FFMPEG_OPT} "'-seg_max_retry 5'; }
 	utils check_ffmpeg_ver "7.1" && \
 		{ local FFMPEG_BASEVER="7.1"; local EXT_FFMPEG_OPT="${EXT_FFMPEG_OPT} "'-reconnect_max_retries 3'; }
+
+	[ -n "${RECORDING_IGNORE_PROXY}" ] && { local EXT_FFMPEG_OPT="${EXT_FFMPEG_OPT} "'-http_proxy 0'; }
 
 	local FFMPEG_OPT="$(
 		cat <<-'EOT'

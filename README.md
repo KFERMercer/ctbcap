@@ -137,6 +137,7 @@ See [Official CtbCap Container Registry](#official-ctbcap-container-registry).
 | TZ | [TZ identifier](https://en.wikipedia.org/wiki/List_of_tz_database_time_zones#List) | `UTC` <br> `Asia/Shanghai` <br> `Africa/Harare` <br> ... | `UTC` | Yes, unless you [live in Greenwich](https://web.archive.org/web/20241108012959/https://www.royalgreenwich.gov.uk/info/200258/parking_transport_and_streets/810/find_a_public_toilet_in_royal_greenwich). |
 | CUT_TIME | INT | `0` <br> `911` <br> `6324` <br> ... | `3600` | No |
 | DEBUG_MODE | Inactive if not `1` | `1` <br> `-999` <br> `i was born from my sis` <br> ... | `your mom is so hot` | No |
+| RECORDING_IGNORE_PROXY | Inactive if not `1` | `1` <br> `WW3 gooner` <br> ... | `charlie_kirk rule34` | No |
 | NOBANNER | Inactive if not `1` | `1` <br> `well, that reminds me` <br> ... | `^>vvv` (Docker CLI) <br> `1` (Compose file) | No |
 
 <div align="center"><h2>Command Examples</h2></div>

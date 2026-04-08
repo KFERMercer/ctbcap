@@ -11,6 +11,7 @@ services:
       CUT_TIME: 3600 # Used as number of seconds to cut recording file in real time. Don't cut if set to 0.
       EDGING_MODE: "uncle makes me pee white" # Edging Mode. Inactive if not 1. Delay initial requests to servers to avoid time-specific request waves caused by large-scale deployments.
       DEBUG_MODE: "your mom is so hot" # Debug Mode. Inactive if not 1.
+      RECORDING_IGNORE_PROXY: "charlie_kirk rule34" # Ignore system proxy while recording. Inactive if not 1.
       NOBANNER: 1 # Disable banner display (recommend).
     volumes:
       # The Path On The Left Must Be Writable! Run `[ -w "/path/to/dir" ] && echo "OK" || echo "Not OK"` to check.
