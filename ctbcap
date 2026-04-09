@@ -545,7 +545,7 @@ grab_stream() {
 		[ -n "${RECORDING_IGNORE_PROXY}" ] && { local EXT_N_m3u8DL_RE_OPT="${EXT_N_m3u8DL_RE_OPT} "'--use-system-proxy False'; }
 
 		[ -n "${N_M3U8DL_NO_FFMPEG_PIPE}" ] \
-			&& { local EXT_N_m3u8DL_RE_OPT="${EXT_N_m3u8DL_RE_OPT} "'--save-dir "${SAVE_PATH}" --mux-after-done mkv'; } \
+			&& { local EXT_N_m3u8DL_RE_OPT="${EXT_N_m3u8DL_RE_OPT} "'--save-dir "${SAVE_PATH}"'; } \
 			|| { local EXT_N_m3u8DL_RE_OPT="${EXT_N_m3u8DL_RE_OPT} "'--live-pipe-mux True'; }
 
 		# shellcheck disable=2034
@@ -564,9 +564,9 @@ grab_stream() {
 				--download-retry-count 2
 				--http-request-timeout 5
 				--auto-select True
+				--live-take-count 4
 				--live-real-time-merge True
 				--live-keep-segments False
-				--live-take-count 1
 				--del-after-done True
 			EOT
 		)${EXT_N_m3u8DL_RE_OPT}"
@@ -603,7 +603,20 @@ grab_stream() {
 
 		rm -rf "${SAVE_PATH}/temp/${MODEL}"*
 
-		RE_LIVE_PIPE_OPTIONS="-copyts -start_at_zero -copy_unknown -fflags +genpts -codec copy -f segment -segment_time ${CUT_TIME} -segment_start_number 1 -reset_timestamps 1 ${SAVE_PATH}/${MODEL}-${CAPTURE_TIME}_%03d.mkv" sh -c "${N_m3u8DL_RE_EXEC}" #Launch N_m3u8DL_RE
+		[ -n "${N_M3U8DL_NO_FFMPEG_PIPE}" ] || {
+			export RE_LIVE_PIPE_OPTIONS="-f segment -segment_time ${CUT_TIME} -segment_start_number 1 -reset_timestamps 1 ${SAVE_PATH}/${MODEL}-${CAPTURE_TIME}_%03d.mkv"
+		}
+
+		sh -c "${N_m3u8DL_RE_EXEC}" #Launch N_m3u8DL_RE
+
+		[ -n "${N_M3U8DL_NO_FFMPEG_PIPE}" ] && {
+			ffmpeg -y -loglevel warning -nostdin \
+				-fflags +genpts -i "${SAVE_PATH}/${MODEL}-${CAPTURE_TIME}.mp4" \
+				-fflags +genpts -i "${SAVE_PATH}/${MODEL}-${CAPTURE_TIME}.m4a" \
+				-codec copy \
+				-f segment -segment_time "${CUT_TIME}" -segment_start_number 1 -reset_timestamps 1 \
+				"${SAVE_PATH}/${MODEL}-${CAPTURE_TIME}_%03d.mkv"
+		} && { rm -f "${SAVE_PATH}/${MODEL}-${CAPTURE_TIME}.mp4" "${SAVE_PATH}/${MODEL}-${CAPTURE_TIME}.m4a"; }
 
 		rm -rf "${SAVE_PATH}/temp/${MODEL}"*
 
