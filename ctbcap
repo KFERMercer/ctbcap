@@ -541,29 +541,17 @@ grab_stream() {
 	utils check_depend "N_m3u8DL-RE" >/dev/null 2>&1 && {
 		[ -n "${RECORDING_IGNORE_PROXY}" ] && { local EXT_N_m3u8DL_RE_OPT="${EXT_N_m3u8DL_RE_OPT} "'--use-system-proxy False'; }
 
-		# local N_m3u8DL_RE_OPT="$(
-		# 	cat <<-'EOT'
-		# 		--log-level INFO
-		#		--no-log
-		# 		--save-dir "${SAVE_PATH}"
-		# 		--tmp-dir "${SAVE_PATH}/temp"
-		# 		--save-name "${MODEL}-${CAPTURE_TIME}"
-		# 		--auto-select True
-		# 		--live-real-time-merge True
-		# 		--mux-after-done mkv
-		# 		--live-pipe-mux
-		#		--del-after-done True
-		# 	EOT
-		# )${EXT_N_m3u8DL_RE_OPT}"
-
 		local N_m3u8DL_RE_OPT="$(
 			cat <<-'EOT'
 				--log-level INFO
 				--no-log
 		 		--tmp-dir "${SAVE_PATH}/temp"
 				--save-name "${MODEL}-${CAPTURE_TIME}"
+				--thread-count 4
 				--auto-select True
-				--live-pipe-mux
+		 		--live-real-time-merge True
+				--live-keep-segments False
+				--live-pipe-mux True
 				--del-after-done True
 			EOT
 		)${EXT_N_m3u8DL_RE_OPT}"
