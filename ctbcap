@@ -402,7 +402,7 @@ init_path() {
 			}
 			[ "${LINE}" -le 0 ] && { true > "${FILE}"; } >/dev/null 2>&1
 			[ "$(wc -l 2>/dev/null < "${FILE}" || echo 0)" -ge "$(( LINE + 2000 ))" ] && { # 2000 as buffer size
-				echo "Trim [${FILE}] to ${LINE} lines..."
+				log "Trim [${FILE}] to ${LINE} lines..."
 				local BUFFER_FILE="/dev/shm/_$(basename -- "${FILE}" 2>/dev/null || echo what_the_fuck)_$(date +%s)"
 				tail -n "${LINE}" -- "${FILE}" > "${BUFFER_FILE}"
 				cat "${BUFFER_FILE}" > "${FILE}"
