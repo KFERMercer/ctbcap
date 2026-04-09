@@ -541,12 +541,16 @@ grab_stream() {
 	utils check_depend "N_m3u8DL-RE" >/dev/null 2>&1 && {
 		[ -n "${RECORDING_IGNORE_PROXY}" ] && { local EXT_N_m3u8DL_RE_OPT="${EXT_N_m3u8DL_RE_OPT} "'--use-system-proxy False'; }
 
+		# shellcheck disable=2034
+		local HTTP_HEADERS="User-Agent: ${UA}"
+
 		local N_m3u8DL_RE_OPT="$(
 			cat <<-'EOT'
 				--log-level INFO
 				--no-log
 		 		--tmp-dir "${SAVE_PATH}/temp"
 				--save-name "${MODEL}-${CAPTURE_TIME}"
+				--header "${HTTP_HEADERS}"
 				--thread-count 4
 				--auto-select True
 		 		--live-real-time-merge True
