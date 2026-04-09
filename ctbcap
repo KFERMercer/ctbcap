@@ -546,7 +546,7 @@ grab_stream() {
 
 		[ -n "${N_M3U8DL_NO_FFMPEG_PIPE}" ] \
 			&& { local EXT_N_m3u8DL_RE_OPT="${EXT_N_m3u8DL_RE_OPT} "'--save-dir "${SAVE_PATH}" --mux-after-done mkv'; } \
-			|| { local EXT_N_m3u8DL_RE_OPT="${EXT_N_m3u8DL_RE_OPT} "'--live-real-time-merge True --live-keep-segments False --live-pipe-mux True'; }
+			|| { local EXT_N_m3u8DL_RE_OPT="${EXT_N_m3u8DL_RE_OPT} "'--live-pipe-mux True'; }
 
 		# shellcheck disable=2034
 		local HTTP_HEADERS="User-Agent: ${UA}"
@@ -560,6 +560,9 @@ grab_stream() {
 				--header "${HTTP_HEADERS}"
 				--thread-count 4
 				--auto-select True
+				--live-real-time-merge True
+				--live-keep-segments False
+				--no-date-info True
 				--del-after-done True
 			EOT
 		)${EXT_N_m3u8DL_RE_OPT}"
