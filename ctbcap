@@ -145,6 +145,10 @@ doc() {
 		command -v "ffmpeg" >/dev/null 2>&1 || echo "N/A"
 		ffmpeg -version 2>/dev/null | awk 'NR==1 {print $3}'
 		echo
+		printf "N_m3u8DL-RE: "
+		command -v "N_m3u8DL-RE" >/dev/null 2>&1 || echo "N/A"
+		N_m3u8DL-RE --version 2>/dev/null
+		echo
 		echo "See [ -h ] for Command Help."
 	;;
 	esac
