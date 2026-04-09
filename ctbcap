@@ -562,6 +562,7 @@ grab_stream() {
 				--auto-select True
 				--live-real-time-merge True
 				--live-keep-segments False
+				--live-take-count 2
 				--no-date-info True
 				--del-after-done True
 			EOT
