@@ -553,12 +553,15 @@ grab_stream() {
 
 		local N_m3u8DL_RE_OPT="$(
 			cat <<-'EOT'
+				--disable-update-check True
 				--log-level INFO
 				--no-log
 		 		--tmp-dir "${SAVE_PATH}/temp"
 				--save-name "${MODEL}-${CAPTURE_TIME}"
 				--header "${HTTP_HEADERS}"
 				--thread-count 4
+				--download-retry-count 2
+				--http-request-timeout 5
 				--auto-select True
 				--live-real-time-merge True
 				--live-keep-segments False
