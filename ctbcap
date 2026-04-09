@@ -539,6 +539,8 @@ grab_stream() {
 	local CAPTURE_TIME="$(date "+%Y%m%d-%H%M%S")"
 
 	utils check_depend "N_m3u8DL-RE" >/dev/null 2>&1 && {
+		[ -n "${RECORDING_IGNORE_PROXY}" ] && { local EXT_N_m3u8DL_RE_OPT="${EXT_N_m3u8DL_RE_OPT} "'--use-system-proxy False'; }
+
 		# local N_m3u8DL_RE_OPT="$(
 		# 	cat <<-'EOT'
 		# 		--log-level INFO
@@ -552,7 +554,7 @@ grab_stream() {
 		# 		--live-pipe-mux
 		#		--del-after-done True
 		# 	EOT
-		# )"
+		# )${EXT_N_m3u8DL_RE_OPT}"
 
 		local N_m3u8DL_RE_OPT="$(
 			cat <<-'EOT'
@@ -564,7 +566,7 @@ grab_stream() {
 				--live-pipe-mux
 				--del-after-done True
 			EOT
-		)"
+		)${EXT_N_m3u8DL_RE_OPT}"
 
 		# shellcheck disable=2089
 		local N_m3u8DL_RE_IN='"${STREAM_URL}"'
