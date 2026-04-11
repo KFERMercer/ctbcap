@@ -561,8 +561,8 @@ grab_stream() {
 				--header "${HTTP_HEADERS}"
 				--concurrent-download True
 				--thread-count 4
-				--download-retry-count 2
-				--http-request-timeout 5
+				--download-retry-count 1
+				--http-request-timeout 2
 				--auto-select True
 				--live-take-count 4
 				--live-real-time-merge True
