@@ -584,7 +584,7 @@ grab_stream() {
 				--concurrent-download True
 				--thread-count 4
 				--live-wait-time 5
-				--download-retry-count 1
+				--download-retry-count 3
 				--http-request-timeout 1
 				--auto-select True
 				--live-take-count 3
@@ -628,10 +628,13 @@ grab_stream() {
 		rm -rf "${SAVE_PATH}/temp/${MODEL}"*
 
 		[ -n "${N_M3U8DL_NO_FFMPEG_PIPE}" ] || {
-			export RE_LIVE_PIPE_OPTIONS=" \
-				-shortest \
-				-f segment -segment_time ${CUT_TIME} -segment_start_number 1 -reset_timestamps 1 \
-				${SAVE_PATH}/${MODEL}-${CAPTURE_TIME}_%03d.mkv"
+			export RE_LIVE_PIPE_OPTIONS="-shortest ${SAVE_PATH}/${MODEL}-${CAPTURE_TIME}.mkv"
+			[ -n "${CUT_TIME}" ] && {
+				export RE_LIVE_PIPE_OPTIONS=" \
+					-shortest \
+					-f segment -segment_time ${CUT_TIME} -segment_start_number 1 \
+					${SAVE_PATH}/${MODEL}-${CAPTURE_TIME}_%03d.mkv"
+			}
 		}
 
 		sh -c "${N_m3u8DL_RE_EXEC}" #Launch N_m3u8DL_RE
@@ -642,7 +645,7 @@ grab_stream() {
 				-fflags +genpts -i "${SAVE_PATH}/${MODEL}-${CAPTURE_TIME}.m4a" \
 				-codec copy \
 				-shortest \
-				-f segment -segment_time "${CUT_TIME}" -segment_start_number 1 -reset_timestamps 1 \
+				-f segment -segment_time "${CUT_TIME}" -segment_start_number 1 \
 				"${SAVE_PATH}/${MODEL}-${CAPTURE_TIME}_%03d.mkv"
 		} && { rm -f "${SAVE_PATH}/${MODEL}-${CAPTURE_TIME}.mp4" "${SAVE_PATH}/${MODEL}-${CAPTURE_TIME}.m4a"; }
 
