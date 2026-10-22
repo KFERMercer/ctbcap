@@ -71,7 +71,7 @@ USER ${CUID}:${CGID}
 # FFmpeg builder.
 FROM mother AS builder
 
-RUN apk add --no-cache build-base gnupg openssl-dev nasm zlib-dev
+RUN apk add --no-cache build-base gnupg openssl-dev nasm zlib-dev patch
 
 RUN <<EOT
 	cat <<-EOK | gpg --import # FFmpeg public PGP key
@@ -113,15 +113,7 @@ EOT
 WORKDIR /ffmpeg_source
 
 RUN <<EOT
-	# Get newest version tarball of FFmpeg.
-	FFMPEG_TARBALL="$( \
-		curl -s -L -k --connect-timeout 5 --retry 3 \
-			"https://ffmpeg.org/releases/" \
-			| grep -oE 'ffmpeg-[0-9]+.*.tar.xz' \
-			| sed 's|\.tar.xz.*||' \
-			| sort -V \
-			| tail -n 1 \
-	).tar.xz"
+	FFMPEG_TARBALL="ffmpeg-9.0.2.tar.xz"
 
 	curl -L -k --connect-timeout 5 --retry 3 \
 		"https://ffmpeg.org/releases/${FFMPEG_TARBALL}" \
@@ -139,6 +131,20 @@ RUN <<EOT
 	echo "(INFO) Will build using ${FFMPEG_TARBALL} ..."
 
 	tar -xf "${FFMPEG_TARBALL}" --strip-components 1
+EOT
+
+COPY ./patches /ffmpeg_source/patches
+
+RUN <<EOT
+	for p in /ffmpeg_source/patches/*.patch; do
+		[ -f "${p}" ] || continue
+		echo "(INFO) Applying patch: $(basename "${p}")"
+		patch -p1 -N -t < "${p}" || {
+			echo >&2 "(ERROR) Failed to apply patch: ${p}"
+			exit 1
+		}
+	done
+	rm -rf /ffmpeg_source/patches
 EOT
 
 WORKDIR /ffmpeg_bin

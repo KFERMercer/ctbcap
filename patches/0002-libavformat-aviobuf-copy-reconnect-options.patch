@@ -1,0 +1,35 @@
+From: KFERMercer <KFER.Mercer@gmail.com>
+Subject: [PATCH 2/2] libavformat/aviobuf: copy reconnect and tls options in ffio_copy_url_options
+
+ffio_copy_url_options() extracts network/transport options from an existing
+AVIOContext to propagate them to nested sub-requests (such as HLS sub-playlists,
+segments, and initialization sections).
+
+Previously, ffio_copy_url_options() only checked a whitelist of basic HTTP options
+and omitted reconnect parameters (reconnect, reconnect_at_eof, reconnect_streamed,
+reconnect_delay_max, reconnect_delay_total_max, reconnect_on_network_error,
+reconnect_on_http_error, reconnect_max_retries) as well as tls_verify.
+Consequently, child HTTP/HTTPS connections created by demuxers like HLS lost
+reconnection capability, resulting in fatal "Error reading HTTP response: End of file"
+errors on closed or idle connections.
+
+This patch adds the reconnect and TLS options to the options whitelist in
+ffio_copy_url_options().
+---
+ libavformat/aviobuf.c | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
+
+--- a/libavformat/aviobuf.c
++++ b/libavformat/aviobuf.c
+@@ -994,7 +994,10 @@ void ffio_init_checksum(AVIOContext *s,
+ int ffio_copy_url_options(AVIOContext* pb, AVDictionary** avio_opts)
+ {
+     const char *opts[] = {
+-        "headers", "user_agent", "cookies", "http_proxy", "referer", "rw_timeout", "icy", NULL };
++        "headers", "user_agent", "cookies", "http_proxy", "referer", "rw_timeout", "icy", "prefer_libcurl",
++        "reconnect", "reconnect_at_eof", "reconnect_on_network_error", "reconnect_on_http_error",
++        "reconnect_streamed", "reconnect_delay_max", "reconnect_max_retries", "reconnect_delay_total_max",
++        "tls_verify", NULL };
+     const char **opt = opts;
+     uint8_t *buf = NULL;
+     int ret = 0;

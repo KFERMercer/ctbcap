@@ -1,0 +1,150 @@
+From: KFERMercer <KFER.Mercer@gmail.com>
+Subject: [PATCH 1/2] libavformat/hls: deduplicate init section and avoid redundant re-downloading
+
+In HLS playlists with EXT-X-MAP (e.g. fMP4 / LL-HLS), every playlist reload
+allocates a new init_section via new_init_section() and appends it to
+pls->init_sections.
+
+Previously:
+1. update_init_section() compared init section pointers (seg->init_section == pls->cur_init_section)
+   rather than content/URL. Since each playlist refresh allocates new init_section
+   instances, pointer equality fails on every refresh cycle (e.g. 1.6s), causing
+   the demuxer to re-download init.m4s repeatedly. This reinjects ftyp/moov atoms into
+   mov.c, triggering "Found duplicated MOOV Atom. Skipped it" warnings and causing
+   playback/recording stuttering.
+2. pls->init_sections grew unboundedly over the lifetime of a live stream because
+   each playlist reload appended another init_section struct without cleanup.
+
+This patch fixes both issues:
+- Introduces init_section_equal() to compare initialization sections by content
+  (URL, size, byte range offset, encryption key, and IV).
+- Deduplicates init sections in parse_playlist() against pls->init_sections so
+  pls->init_sections does not grow unboundedly and existing identical init
+  section pointers are reused.
+- Uses init_section_equal() in update_init_section() to ensure matching init
+  sections are not repeatedly re-downloaded.
+---
+ libavformat/hls.c | 56 +++++++++++++++++++++++++++++++++++++++++++------------
+ 1 file changed, 44 insertions(+), 12 deletions(-)
+
+--- a/libavformat/hls.c
++++ b/libavformat/hls.c
+@@ -444,6 +444,21 @@ struct init_section_info {
+     char byterange[32];
+ };
+ 
++static int init_section_equal(const struct segment *a, const struct segment *b)
++{
++    if (a == b)
++        return 1;
++    if (!a || !b)
++        return 0;
++    if (a->size != b->size || a->url_offset != b->url_offset || a->key_type != b->key_type)
++        return 0;
++    if ((a->key || b->key) && (!a->key || !b->key || strcmp(a->key, b->key)))
++        return 0;
++    if (a->key_type != KEY_NONE && memcmp(a->iv, b->iv, sizeof(a->iv)))
++        return 0;
++    return a->url && b->url && !strcmp(a->url, b->url);
++}
++
+ static struct segment *new_init_section(struct playlist *pls,
+                                         struct init_section_info *info,
+                                         const char *url_base)
+@@ -488,8 +503,6 @@ static struct segment *new_init_section(struct playlist *pls,
+         sec->size = -1;
+     }
+ 
+-    dynarray_add(&pls->init_sections, &pls->n_init_sections, sec);
+-
+     return sec;
+ }
+ 
+@@ -956,39 +969,65 @@ static int parse_playlist(HLSContext *c, const char *url,
+                 pls->type = PLS_TYPE_VOD;
+         } else if (av_strstart(line, "#EXT-X-MAP:", &ptr)) {
+             struct init_section_info info = {{0}};
++            struct segment *sec;
++            int i;
+             ret = ensure_playlist(c, &pls, url);
+             if (ret < 0)
+                 goto fail;
+             ff_parse_key_value(ptr, handle_init_section_args, &info);
+-            cur_init_section = new_init_section(pls, &info, url);
+-            if (!cur_init_section) {
++            sec = new_init_section(pls, &info, url);
++            if (!sec) {
+                 ret = AVERROR(ENOMEM);
+                 goto fail;
+             }
+-            cur_init_section->key_type = key_type;
++            sec->key_type = key_type;
+             if (has_iv) {
+-                memcpy(cur_init_section->iv, iv, sizeof(iv));
++                memcpy(sec->iv, iv, sizeof(iv));
+             } else {
+                 int64_t seq = pls->start_seq_no + pls->n_segments;
+-                memset(cur_init_section->iv, 0, sizeof(cur_init_section->iv));
+-                AV_WB64(cur_init_section->iv + 8, seq);
++                memset(sec->iv, 0, sizeof(sec->iv));
++                AV_WB64(sec->iv + 8, seq);
+             }
+ 
+             if (key_type != KEY_NONE) {
+                 ff_make_absolute_url(tmp_str, sizeof(tmp_str), url, key);
+                 if (!tmp_str[0]) {
+-                    av_free(cur_init_section);
++                    av_freep(&sec->url);
++                    av_free(sec);
+                     ret = AVERROR_INVALIDDATA;
+                     goto fail;
+                 }
+-                cur_init_section->key = av_strdup(tmp_str);
+-                if (!cur_init_section->key) {
+-                    av_free(cur_init_section);
++                sec->key = av_strdup(tmp_str);
++                if (!sec->key) {
++                    av_freep(&sec->url);
++                    av_free(sec);
+                     ret = AVERROR(ENOMEM);
+                     goto fail;
+                 }
+             } else {
+-                cur_init_section->key = NULL;
++                sec->key = NULL;
++            }
++
++            cur_init_section = NULL;
++            for (i = 0; i < pls->n_init_sections; i++) {
++                if (init_section_equal(pls->init_sections[i], sec)) {
++                    cur_init_section = pls->init_sections[i];
++                    av_freep(&sec->key);
++                    av_freep(&sec->url);
++                    av_free(sec);
++                    break;
++                }
++            }
++            if (!cur_init_section) {
++                av_dynarray_add(&pls->init_sections, &pls->n_init_sections, sec);
++                if (!pls->init_sections) {
++                    av_freep(&sec->key);
++                    av_freep(&sec->url);
++                    av_free(sec);
++                    ret = AVERROR(ENOMEM);
++                    goto fail;
++                }
++                cur_init_section = sec;
+             }
+ 
+         } else if (av_strstart(line, "#EXT-X-START:", &ptr)) {
+@@ -1565,8 +1604,10 @@ static int update_init_section(struct playlist *pls, struct segment *seg)
+     int64_t urlsize;
+     int ret;
+ 
+-    if (seg->init_section == pls->cur_init_section)
++    if (init_section_equal(seg->init_section, pls->cur_init_section)) {
++        pls->cur_init_section = seg->init_section;
+         return 0;
++    }
+ 
+     pls->cur_init_section = NULL;
