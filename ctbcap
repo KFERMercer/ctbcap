@@ -547,7 +547,7 @@ fetch_m3u() {
 grab_stream() {
 	local FFMPEG_BASEVER="5.0"
 	utils check_ffmpeg_ver "6.0" && \
-		{ local FFMPEG_BASEVER="6.0"; local EXT_FFMPEG_OPT="${EXT_FFMPEG_OPT} "'-seg_max_retry 5'; }
+		{ local FFMPEG_BASEVER="6.0"; local EXT_FFMPEG_OPT="${EXT_FFMPEG_OPT} "'-seg_max_retry 1'; }
 	utils check_ffmpeg_ver "7.1" && \
 		{ local FFMPEG_BASEVER="7.1"; local EXT_FFMPEG_OPT="${EXT_FFMPEG_OPT} "'-reconnect_max_retries 3'; }
 
