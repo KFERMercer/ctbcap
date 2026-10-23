@@ -71,7 +71,7 @@ USER ${CUID}:${CGID}
 # FFmpeg builder.
 FROM mother AS builder
 
-RUN apk add --no-cache build-base gnupg openssl-dev nasm zlib-dev
+RUN apk add --no-cache build-base gnupg openssl-dev zlib-dev
 
 RUN <<EOT
 	cat <<-EOK | gpg --import # FFmpeg public PGP key
@@ -115,7 +115,7 @@ WORKDIR /ffmpeg_source
 RUN <<EOT
 	# Get newest version tarball of FFmpeg.
 	FFMPEG_TARBALL="$( \
-		curl -s -L -k --connect-timeout 5 --retry 3 \
+		curl -s -L -k --connect-timeout 30 --retry 3 \
 			"https://ffmpeg.org/releases/" \
 			| grep -oE 'ffmpeg-[0-9]+.*.tar.xz' \
 			| sed 's|\.tar.xz.*||' \
@@ -123,11 +123,11 @@ RUN <<EOT
 			| tail -n 1 \
 	).tar.xz"
 
-	curl -L -k --connect-timeout 5 --retry 3 \
+	curl -L -k --connect-timeout 30 --retry 3 \
 		"https://ffmpeg.org/releases/${FFMPEG_TARBALL}" \
 		-o "${FFMPEG_TARBALL}"
 
-	curl -L -k --connect-timeout 5 --retry 3 \
+	curl -L -k --connect-timeout 30 --retry 3 \
 		"https://ffmpeg.org/releases/${FFMPEG_TARBALL}.asc" \
 		-o "${FFMPEG_TARBALL}.asc"
 
@@ -150,19 +150,19 @@ RUN <<EOT
 		--disable-debug \
 		--disable-autodetect \
 		--disable-avdevice \
-		--disable-swscale \
+		--disable-swscale --disable-swresample \
 		--disable-doc \
 		--disable-programs --enable-ffmpeg \
 		--disable-shared --enable-static \
+		--disable-x86asm \
 		--enable-zlib --enable-openssl \
 		--enable-decoder=h264,hevc,av1,aac \
 		--enable-parser=h264,hevc,av1,aac \
-		--enable-demuxer=hls,mp4,m4v,mpegts \
+		--enable-demuxer=hls,mov,mpegts \
 		--enable-muxer=segment,matroska \
-		--enable-protocol=hls,http,https,file,udp \
+		--enable-protocol=http,https,file,crypto,data \
 		--enable-bsf=extract_extradata \
-		--enable-small \
-		--optflags=-O3 --extra-ldflags="-s"
+		--enable-small --extra-ldflags="-s"
 EOT
 
 RUN <<EOT
